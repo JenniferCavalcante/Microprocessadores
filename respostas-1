@@ -1,6 +1,6 @@
 Respostas Microeletronica
 1.O que são sistemas embarcados?
-2. o que são sistemas embarcados?
+2. o que são microprocessadores?
 3. apresente aplicações de sistemas embarcados:
 para industria automotiva;
 para eletrodomésticos;
@@ -8,3 +8,27 @@ para automação industrial;
 4. cite arquiteturas possíveis e as diferenças entre elas.
 5. Por quê usamos o MPS430 na disciplina, ao invés de outro microcontrolador?
 
+Respostas:
+1)Sistemas embarcado funciona como um computador projetado para um determinado propósito da sua apliacação, ao invés de um sistema 
+computacional generalizado. Essa definição independe da sua construção, pode abranger desde lógicas combinacionais e processadores 
+de 8-bits, até processadores de 64-bits multi-cores e ASICs.
+
+2)Responsável pro executar as instruções e cálculos que constituem os programas, ao mesmo tempo que é responsável por enviar informações
+solicitadas por todos os componentes do computador. É de vital importância para o funcionamento do computador.
+
+3)
+a) gps, navegação, freios abs, air bag, controle de tração, painel de instrumentos. 
+b)microondas com suas funções de:  descongelar, pipoca, carnes, legumess
+smart tv com a função de gravar programada, acesso a internet, armazenamento de aplicativos, comando por voz
+c)Os sistemas embarcados utilizados na automação industrial utilizam os mais diversos tipos de processadores, de microcontroladores 8-bits
+a poderosos ARM Cortex A ou i386, a escolha do processador mais adequado depende de características como performance, segurança, 
+e é claro do custo do projeto. Também não é difícil encontrarmos FPGAs nesses equipamentos.
+segurança operacional, menores perdas de produção, maior preservação do meio ambiente, capacidade de monitoramento remota,
+qualidade do produto final
+
+4) Os de usos pessoais que são dominados por x86 da Intel/AMD, os sistemas embarcados utilizam amplamente as arquiteturas ARM, PowerPC, 
+PIC, AVR, 8051, Coldfire, TMS320, blackfin.
+
+5) Essa plaquinha possui muitos dos recursos de hardware necessários para um iniciante se aventurar na área da computação embarcada. 
+Essa linha de microcontroladores é conhecida pelo seu baixíssimo consumo elétrico (230 uA a 1MHz/2.2 V), sendo ideal para dispositivos 
+alimentados por bateria. Eles possuem uma arquitetura RISC de 16 bits podendo trabalhar a uma frequência interna de até 16 MHz.
