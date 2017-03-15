@@ -1,8 +1,18 @@
 Data: 15/03/2017
 
 Q1. Quais as diferenças entre os barramentos de dados e de endereços?
+Barramento de dados: Possui, em geral, uma linha (fio) para cada bit de dados. 
+Num microcomputador a largura do barramento de dados (bus width) é o fator de especificação de barramento mais lembrado.
+Se diz por exemplo: "O microcomputador PC tem um barramento de 8bits". Ou então: "O microprocessador 8086 tem um barramento de 16 bits 
+e o microprocessador 80386 tem um barramento de 32 bits". 
+Barramento de Endereços: Possui uma linha (fio) para cada bit de endereçamento. 
+A largura do barramento de endereçamento é importante para determinar a capacidade máxima de posições de memória acessíveis. 
 
 Q2. Quais são as diferenças entre as memórias RAM e ROM?
+ROM: Permite apenas a leitura, ou seja, as suas informações são gravadas pelo fabricante uma única vez e após isso não podem ser alteradas ou apagadas, 
+somente acessadas. São memórias cujo conteúdo é gravado permanentemente.
+RAM: é aquela que permite a gravação e a regravação dos dados,no entanto, se o computador for desligado, por exemplo, 
+perde as informações registradas.
 
 Q3. Considere o código abaixo, de 12 linhas:
 
@@ -21,12 +31,42 @@ Q3. Considere o código abaixo, de 12 linhas:
 
 Para este código, responda:
 	(a) A variável 'i' é armazenada na memória RAM ou ROM? Por quê?
+		ROM, porque trata-se de uma memória que permite apenas a leitura, e nesse caso ele está lendo seu conteúdo, no caso
+	uma variavel inteira.
+		
 	(b) O programa compilado a partir deste código é armazenado na memória RAM ou ROM? Por quê?
+		RAM, porque é uma memória que permite ser escrita, ou seja, gravada e regravada.
 
 Q4. Quais são as diferenças, vantagens e desvantagens das arquiteturas Harvard e Von Neumann?
+A Arquitetura de von Neumann (de John von Neumann), é uma arquitetura de computador que se caracteriza pela possibilidade de uma máquina 
+digital armazenar seus programas no mesmo espaço de memória que os dados, podendo assim manipular tais programas.
+A máquina proposta por Von Neumann reúne os seguintes componentes: (i) uma memória, (ii) uma unidade aritmética e lógica (ALU), 
+(iii) uma unidade central de processamento (CPU), composta por diversos registradores, e (iv) uma Unidade de Controle (CU), 
+cuja função é a mesma da tabela de controle da Máquina de Turing universal: buscar um programa na memória, instrução por instrução,
+ e executá-lo sobre os dados de entrada.
+A Arquitetura de Harvard baseia-se em um conceito mais recente que a de Von-Neumann, tendo vindo da necessidade de por o
+ microcontrolador para trabalhar mais rápido. É uma arquitetura de computador que se distingue das outras por possuir duas memórias 
+diferentes e independentes em termos de barramento e ligação ao processador.
+Baseia-se na separação de barramentos de dados das memórias onde estão as instruções de programa e das memórias de dados, 
+permitindo que um processador possa acessar as duas simultaneamente, obtendo um desempenho melhor do que a da Arquitetura de 
+von Neumann, pois pode buscar uma nova instrução enquanto executa outra.
+A principal vantagem desta arquitectura é dada pela dupla ligação às memórias de dados e programa (código), permitindo assim que o 
+processador leia uma instrução ao mesmo tempo que faz um acesso à memória de dados.
+A arquitetura Havard também possui um repertório com menos instruções que a de Von-Neumann, e essas são executadas apenas num único 
+ciclo de relógio.
+Os microcontroladores com arquitetura Havard são também conhecidos como “microcontroladores RISC” 
+(Computador com Conjunto Reduzido de Instruções), e os microcontroladores com uma arquitetura Von-Neumann, de “microcontroladores CISC” 
+(Computador com um Conjunto Complexo de Instruções).
 
-Q5. Considere a variável inteira 'i', armazenando o valor 0x8051ABCD. Se 'i' é armazenada na memória a partir do endereço 0x0200, como ficam este byte e os seguintes, considerando que a memória é:
+Q5. Considere a variável inteira 'i', armazenando o valor 0x8051ABCD. Se 'i' é armazenada na memória a partir do endereço 0x0200, 
+como ficam este byte e os seguintes, considerando que a memória é:
 	(a) Little-endian?
+	0xABCD em 0x0200
+	0x8051 em 0x0201
 	(b) Big-endian?
+	0xABCD em 0x0201
+	0x8051 em 0x0200	
 
 Q6. Sabendo que o processador do MSP430 tem registradores de 16 bits, como ele soma duas variáveis de 32 bits?
+Através da unidade de lógica-aritmética  com 16 registradores, onde armazena numa flag e  aponta para o endereço da próxima instrução
+a ser executada.
