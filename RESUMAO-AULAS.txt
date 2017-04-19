@@ -1,0 +1,544 @@
+RESUMÃO PROVA 1
+
+MSP430
+processador de 16 bits
+arquitetura von Neumann
+aplicações de baixo consumo de energia
+barramento de dados e de memória de 16 bits
+reg 16 bits
+reg podem ser usadas para variaveis locais
+msp430 permite aritmética diretamente com valores de memória
+cpu pequena e eficiente, mtos rgs
+varios modos de baixo consumo 
+facilmente colocado em modo de baixo consumo
+alguns msp430 possuem hardware analógico p/ aplicações específicas.
+
+======================================================================
+MEMÓRIA
+Memória é separada em bytes
+barramento de endereço de 16 bits
+2^16=64kb de memória
+barramento de memória é de 16 bits
+transfere bytes ou palavras de 2 bytes
+a palavra 0x1234 é armazenada no endereço 0x0200
+0x34 em 0x0200
+0x12 em 0x0201
+o msp430 é littlee-endian, o contrário é big-endian
+
+==========================================================================
+CPU
+possui uma ULA com 16 regs
+possui lógica estática: não possui uma frequencia mínima de operação
+seu estado não é perdido quando para de funcionar
+flags:
+Z= 1 qndo a última operação resultou em zero
+cada porta> 1 byte
+cada pino> 1 bit de cada byte
+
+=========================================================================
+GERADOR DE CLOCK
+sinal de clk é uma onda quadrada cuja as bordas acionam diferetes 
+hardwares de forma sincronizada
+msp430 2 clk
+
+=========================================================================
+PIDIR = 0X41 configura os pinos 0 e 6 como saída q estão conectados ao leds
+PIOUT = 0X41 leva os pinos 0 e 6 para o Vcc ligando 2 leds
+
+//Loop infinito - O msp430 não tem SO
+for(;;)  
+{
+}
+
+Forma alternativa de setar bits
+PIDIR=BIT6+BIT0; 
+PIOUT = BIT6+BIT0;
+(bit0 = 0b00000001
+bit6 = 0b01000000)
+ 
+ORG 0xC000
+msp430g2 tem 16kb de mem´roia flash que começa no endereço listado acima
+reset: >> início da execução do código
+ORG 0xFFFE é o end do vetor do msp430
+DW Reset é o end p/ ond apaonto o vetor Reset
+
+======================================================================
+LIGANDO LEDS
+
+// Ligar LEDS enquanto o botão estiver pressionado
+#include <msp430g2553.h>
+#define BTN BIT2
+#define LED1 BIT0
+#define LED2 BIT6
+definições p/ clarear o código
+
+void main(void){
+WDTCTL = WDTPW|WDTHOLD
+//leds desligados
+P1OUT =0;
+P1DIR= LED1+LED2;
+//led 1 e led 2 como saídas, BTN como entrada
+for(;;)
+{
+//ligar os leds enquanto o botão estiver pressionado
+if(P1IN&BTN==0)
+P1OUT|=LED1+LED2;
+//caso contrário, apagar os leds
+else
+P1OUT&=~(LEd1+LED2);
+}
+}
+
+====================================================================
+
+LIGANDO LEDS
+#include <msp430g2553.h>
+#define BTN BIT2
+#define LED1 BIT0
+#define LED2 BIT6
+definições p/ clarear o código
+
+void main(void){
+WDTCTL = WDTPW|WDTHOLD
+//leds desligados
+P1OUT =0;
+P1DIR= LED1+LED2;
+//led 1 e led 2 como saídas, BTN como entrada
+for(;;)
+{
+//código fica preso neste laço enquanto o botão não é pressionado
+while((P1IN&BTN)!=0){}
+//qnado o botão é pressionado, o código sai do laço e liga os leds
+P1OUT|=LED1+LED2;
+// código fica preso neste laçi enquanto o botão é pressionado
+while ((P1IN&BTN)==0{}
+// botão solto sai do laço e led apaga
+P1OUT&=~(LEd1+LED2);
+}
+}
+
+===================================================================
+CONJUNTO DE INSTRUÇÕES
+
+**OPERAÇÕES ARITMÉTICAS**
+f=(g+h)-(i+j) 
+//Para MSP430 fica
+mov.w g,t0 	//t0 guarda g
+add.w h,t0 	//t0 guarda uma soma
+mov.w i, tl 	//tl guarda i
+add.w j,tl	//tl guarda outra soma
+sub tl,t0	//t0 guarda subtração
+mov.w to,f	//f recebe valor final
+
+MENOR É MAIS RÁPIDO
+
+mov.w R5,R10	//R10 recebe g(R5)
+add.w R6,R10	//R10 g+h (R5+R6)
+mov.w R7,R11	//R11 recebe i(R7)
+add.w R8,R11	//R11 = i+j (R7+R8)
+sub.w R11,R10	//R10=R10-R11
+mov.w R10, f	//f (r4) recebe valor final
+
+g=h+A[8] // ; serve para comentário
+//end R9 foi lido e guardado em R9, andou 16 bytes a frente.
+//o valor foi lido e armazenado neste end e guardado em R5
+mov.w 16(R9),R5  ;R9=&(A[0])=A
+add.w R6,R5	 ;R5=g,R6=h
+=======================================================================
+
+OPPERANDOS NA MEMÓRIA
+
+no msp430 a palavra ocupa 2 bytes (16 bits)
+o byte menos significativo fica na memória de baixo
+msp430 é litle-endian
+=====================================================================
+
+A[12]=h+A[8]
+
+mov.w 16(R9),R10
+add.w R6,R10
+//End em R9 foi lido e andou 24 bytes à frente e guardado o valor armazendo
+//em R10
+mov.w R10, 24(R9)
+//Para economizar uma instrução, o valor de A[8] foi jogado em A[12]
+//antes de somar o valor em h (R6)
+mov.w 16(R9),24(R9)
+add.w R6,24(R9)
+======================================================================
+
+OPERANDOS COMUNS
+
+clr.w 	;clear =0
+dec.w 	;decrementa --
+decd.w 	; duplo decremento -= 2
+inc.w 	;incrementa ++
+incd.w 	;duplo incremento +=2
+tst.w 	; teste (compara com 0) -0
+
+======================================================================
+
+REPRESENTANDO INSTRUÇÕES
+
+instrução mov.w R5,R6
+
+|OP-COD|S-reg|Ad  |B/W|As |D-reg|
+|4     |5    |0   |0  |0  |6    |
+|0100  |0101 |0   |0  |00 |0110 |
+
+op-cod => 4 é opcode para mov
+S-reg  => 5 é o nº do reg R5
+Ad     => 0 indica que a CPU deve escrever o resultado no reg R6
+B/W    => 0 indica q a operação a ser feita na palavra completa (2 bytes)
+As     => 0 indica q a CPU deve ler o R5 como fonte
+D-Reg  => 6 é o nº do reg R6
+mov.w R5,R6 é armazenada como:
+0100010100000110 ou 0x4506
+
+=======================================================================
+
+OPERAÇÕES LÓGICAS
+
+R4 contém o valor 9
+0000 0000 0000 1001
+
+rla.w R4
+// valor de R4, desloca de 1bit p/esquerda e guarda o resultado em R4
+0000 0000 0001 0010
+
+// Deslocara um valor binário de n bits para a esquerda é o meso q 
+// multiplica-lo por 2^n
+//exemplo: 9x(2^4)=9x16=144
+// A instrução rla.w R4 é feita como uma soma: add.w R4,R4
+//rla.w é uma instrução emulada.
+
+++++++++++++++++++++++++++++++++++
+R8 contém o valor 9
+0000 0000 0000 1001
+rra.w R8
+valor de R8 desloca 1bit para direita e guarda em R8
+0000 0000 0000 0100
+// equivale a dividir por 2
+// o bit mais significativo, q é mantido na instrução rra.w,
+// equivale ao sinal da variável
+
+++++++++++++++++++++++++++++++++++++++++
+R9 = 0000 1101 0000 0000
+R8 = 0011 1100 0000 0000
+ OR bit-a-bit
+bis R9,R8 //bis vem de bit set
+     0011 1101 0000 0000
+// bits iguais a 0 em R8 foram setados aonde os bits correspondentes em R9
+// eram iguais a 1
+R9 com R8, R8 guarda o valor
+
+++++++++++++++++++++++++++++++++++++++
+R5 = 0000 1101 0000 0000
+R7 = 0011 1100 0000 0000
+ AND bit-a-bit
+and.w R5,R7
+     0000 1100 0000 0000
+// AND força bits a serem zerados. Bits iguais a 1 em R7 foram zerados
+// aonde os bits correspondentes em R5 eram iguais a 0.	 
+
++++++++++++++++++++++++++++++++++++++++
+R5 = 0000 1101 0000 0000
+R7 = 0011 1100 0000 0000
+
+//AND bit-a-bit com o inverso de R5
+
+bic.w R5,R7
+     0011 0000 0000 0000
+
++++++++++++++++++++++++++++++++++++++
+R12 = 0000 1101 0000 0000
+R15 = 0011 1100 0000 0000
+
+//xor.w R12,R15 realiza a op bit-a-bit de R12 comR15
+//Operação XOR força bits a serem invertidos
+//R15 foram invertidos onde os bits correspondentes em R12 eram iguais a 1.
+
++++++++++++++++++++++++++++++++++
+
+R7 = 0000 1101 0000 0000
+
+//inv.w R7 inverte todos os bits de R7 e armazena em R7
+     1111 0010 1111 1111
+===========================================================================
+
+DESVIO CONDICIONAL
+
+cmp R6,R8
+//seta ou reseta N,Z,C e V no reg SR(status register) de acordo com os 
+//valores de R6 e R8
+
+N = 1 se R8<R6(R8-R6<0)
+    0 caso contrário (R8>=R6)
+Z = 1 se R8=R6 (R8-R6=0)
+    0 caso R8!=R6
+C = 1 de houve carry no cálculo R8-R6, 0 se !=
+V = 1 se houve overflow no cálculo R8-R6, 0 se !=
+
+++++++++++++++++++++++++++
+tst R11
+
+//seta ou reseta N,Z,C e V no reg SR(status register) de acordo com os 
+//valores de R11
+
+N = 1 se R11<0
+    0 caso contrário 
+Z = 1 se R11 = 0
+    0 caso contrário
+C = 1 
+V = 0
+
+++++++++++++++++++++++++++
+
+cmp R6,R8
+jne LABEL_2
+
+//cmp compara R6 e R8
+//Se R6 != de R8 jne faz com que a CPU comece a executar as instruções
+// apartir da linha de código LABEL_2
+//Se R6 == R8 segue a leitura normalmente
+
++++++++++++++++++++++=
+
+jmp LABEL_3
+
+// faz com que a CPU comece a executar as instruções apartir da marca
+//LABEL_3 independente dos resultados anteriores.
+
+=======================================================================
+
+OPERAÇÕES ARITMÉTICAS
+
+if (i==j) f= g+h; else f=g-h;
+cmp R7,R8 ;r7=i,r8=j
+jne ELSE  //executa o oposto de if(i==j)
+mov.w R5,R4 ;r4=f, r5=g
+sub.w R6,R4 ;f=g+h(r4=r5+r6)
+jmp EXIT //salto necessário p/evitar que f=g-h seja exucata quando i==j
+ELSE:
+mov.w R5,R4 ;r4=f,r5=g
+sub R6,R4   ;f=g-h(r4=r5-r6)
+EXIT:
+
+
+++++++++++++++++++++++++++++++++
+
+while (save[i]==k)
+	i+=1;
+
+LOOP: mov.w R7,R12	;r7=i, r12=temporário
+//vetor save[] é do tipo inteiro, portanto é necessário multiplicar i por 2
+//para andar pelas posições do vetor
+rla R12			;r12=2*i
+//vetor save[] está na memória, exigindo a definição do end save[i] 
+//antes da leitura
+add.w R10,R12		;compara save[i] com k(r9)
+jne EXIT		; save[i]==k?
+inc.w R7		; i+=1;
+jmp LOOP
+EXIT:
+
+===========================================================================
+
+DESVIO CONDICIONAL
+
+//jne e jeq lidam somente com desigualdade e igualdades, mas também
+//é necessário identificar valores maiores ou menores
+
+cmp R5,R6
+jl OUTRO_LABEL_1
+//se R6<R5, a CPU começa a executar as intruções a partir da linha marcada
+// label OUTRO_LABEL_1
+
+===========================================================================
+
+FUNÇÕES
+
+int Func_Exemplo(int g, int h, int i, int j)
+{
+return (g+h-i-j);
+}
+
+para MSP430
+
+Func_Exemplo:
+add.w R14,R15	;r15=g, r14=14
+sub.w R13,R15	;r13=i
+sub.w R12,R15	;r12=j
+ret		; retorne a função que foi chamada
+
++++++++++++++++++++++++++++++++++++++++++++++
+
+int Func_Exemplo (int g, int h, int i, int j)
+{
+int f=(g+h)-(i+j);
+return f;
+}
+
+para MSP430
+
+Func_Exemplo:
+push.w R4	;guarde R4 na pilha
+push.w R5	;guarde R5 na pilha
+mov.w R15,R4	;R4 =g
+add.w R14,R4	;R4=g+h
+mov.w R13,R5	;R5=i
+add.w R12,R5	;R5=i+j
+sub.w R5,R4	;R4=f=(g+h)-(i+j)
+mov.w R4,R15	;retorne f por R15
+pop.w R5	;recupere R5 na pilha
+pop.w R4	;recupere R4 na pilha
+ret
+
+++++++++++++++++++++++++++++++++++++++
+
+int MULT_UNSIGNED(unsigned int a, unsigned int b)
+
+{
+if(b==0) return 0;
+else
+return a+MULT_unsigned(a,b-1);
+}
+
+PARA MSP430
+
+MULT_unsigned:
+tst.w R14	;b==0?
+jnz MULT_unsigned_else		;Se b não é 0, vá p/ else
+clr.w R15	;return 0
+ret
+MULT_unsigned_else:
+push.w R15	;guarde a na pilha
+//push.w R15 não altera o valor de R15
+dec.w R14	;b--
+call MULT_unsigned	;calcule a*(b-1)
+pop.w R14	;recupere a na pilha
+add.w R14,R15	;return a+a*(b-1)
+ret
+
+++++++++++++++++++++++++++++++++++++++++++
+
+int MULT_signed(int a, int b)
+{
+if(b<0){
+a=-a;
+b=-b;
+}
+return MULT_unsigned(a,b);
+}
+
+PARA MSP430
+
+MULT_signed
+tst.w R14	;b<0?
+jge MULT_signed_else	;se b>=0, não troca sinais
+inv.w R15	;a=-a usando complemento de 2
+inc.w R15
+inv.w R14	;b=-b usando complemento de 2
+inc.w R14
+MULT_signed_else:
+call MULT_unsined
+ret		;retorne na subrotina.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+int Fatorial(int n)
+{
+if(n<2) return 1;
+else return n*Fatorial(n-1);
+}
+
+PARA MSP430:
+
+Fatorial:
+cmp#2,R15	;testar se n<2
+jge L1		;se N>=,pular p/L1
+mov.w #1,R15	;return 1;
+ret 		;retirna para onde a função foi chamada
+L1:push.w R15	;guarda n(R!5) na pilha
+dec.w R15	;calcula n-1
+call Fatorial	;chama Fatorial(n-1)
+pop.w R14	;Recupera n na pilha
+call MULT_signed	;Calcula n*Fatorial(n-1)
+ret		;Retorna para onde a função foi chamada
+
+//A função fatorial() usa a mesma lógica que MULT_unsigned, também faz 
+//chamada a outra subrotina.
+
+===========================================================================
+
+OPERAÇÕES COM BYTES
+
+int strcpy (charx[], chary[])
+{
+int i =0;
+while((x[i]=y[i])!='\0')i++;
+}
+
+PARA MSP430
+
+strcpy: 
+push.w R4		;R4=i
+//push guarda na pilha
+push.w R5		;R5 será temporário
+push.w R6		;R5 será temporário
+clr.w R4		;R4=i=0
+strcpy_while:
+mov.w R14,R5		;R5=y(end do vetor y[])
+add.w R4,R5		;R5=y+i(end de y[i])
+mov.w R15,R6		;R6=x(end do vetor x[])
+add.w R4,R6		;R6=x+i(end de x[i])
+mov.b 0(R5),0(R6)	;x[i]=y[i]
+//0(R5) quer dizer "use como end o valor em R5 somado de 0 bytes"
+//foi usado mov.b pq está tratando de um vetor do tipo char
+tst.w 0(R6)		;x[i]==0?('\0' vale 0 em ASCII)
+jz strcpy_end		;Se for, saia do while()
+inc.w R4		;i++
+jmp strcpy_while	; volta para o while
+strcpy_end:
+pop.w R6		;fim da função. Recupera R6 na pilha
+pop.w R5		;fim da função. Recupera R5 na pilha
+pop.w R4		;fim da função. Recupera R4 na pilha
+ret			;retornar
+
+==============================================================================
+
+FUNÇÕES E SUBROTINAS
+
+convenções de uso dos regs (mspgcc):
+
+argumentos são alocados da esquerda para a direita de R15 a R12
+
+valor de retorno:
+tipos char, int e ponteiro para função R15
+tipos long e float R15:R14
+long long R15:R14:R13:R12
+resultados com mais de 64bits -memória
+R0 a R5 não são usados geralmente pelo compilador
+R12 a R15 não precisam der guardado na pilha antes de serem usados
+R6 a R11 devem sempre ser guardados
+regs são alocados na orde, R12-R15,R11-R0
+char, int e ponteiros ocupam um reg
+long e float 2 regs em ordem litle endian
+long long 4 regs em ordem litle endian
+===========================================================================
+
+INTERRUPÇÕES
+
+este processo toma 6 ciclos de clk
+
+
+
+
+
+
+
+
+
+
+
+
+
