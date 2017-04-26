@@ -1,0 +1,12 @@
+para energia
+
+_BIS_SR()
+  LPM4_bits;
+while(1);
+}
+{
+
+interrupt(port1_vector)
+P1_ISR(void)
+{
+}
